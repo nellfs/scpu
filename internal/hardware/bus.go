@@ -1,7 +1,7 @@
 package hardware
 
 type Bus struct {
-	RAM [64 * 1024]byte
+	Mem [64 * 1024]byte
 }
 
 func NewBus() *Bus {
@@ -9,9 +9,9 @@ func NewBus() *Bus {
 }
 
 func (b *Bus) Read(addr uint16) byte {
-	return b.RAM[addr]
+	return b.Mem[addr]
 }
 
 func (b *Bus) Write(addr uint16, data byte) {
-	b.RAM[addr] = data
+	b.Mem[addr] = data
 }

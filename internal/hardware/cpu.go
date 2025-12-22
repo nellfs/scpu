@@ -198,7 +198,6 @@ func (c *CPU) INDY() (addr uint16, pageCrossed bool) {
 
 func (c *CPU) ADC(value byte) {
 	carry := byte(0)
-
 	if c.P&FlagC != 0 {
 		carry = 1
 	}
@@ -206,8 +205,6 @@ func (c *CPU) ADC(value byte) {
 	result := uint16(c.A) + uint16(value) + uint16(carry)
 
 	c.SetFlag(FlagC, result > 0xFF)
-	c.SetFlag(FlagZ, c.A == 0)
-	c.SetFlag(FlagN, c.A&0x80 != 0)
 	c.SetFlag(FlagV, ((^(c.A ^ value))&(c.A^byte(result))&0x80) != 0)
 
 	c.A = byte(result & 0xFF)

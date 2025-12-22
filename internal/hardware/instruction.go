@@ -214,14 +214,15 @@ func (c *CPU) AND(value byte) {
 	c.SetFlag(FlagN, c.A&0x80 != 0)
 }
 
-// func (c *CPU) ASL(addr uint16) {
-// 	value := c.Bus.Read(addr)
+func (c *CPU) ASL(addr uint16) {
+	value := c.Bus.Read(addr)
+	c.Bus.Write(addr, value) // dummy write
 
-// 	c.SetFlag(FlagC, value&0x80 != 0)
+	c.SetFlag(FlagC, value&0x80 != 0)
 
-// 	value <<= 1
-// 	c.Bus.Write(addr, value)
+	value <<= 1
+	c.Bus.Write(addr, value)
 
-// 	c.SetFlag(FlagZ, value == 0)
-// 	c.SetFlag(FlagN, value&0x80 != 0)
-// }
+	c.SetFlag(FlagZ, value == 0)
+	c.SetFlag(FlagN, value&0x80 != 0)
+}

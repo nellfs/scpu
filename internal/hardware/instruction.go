@@ -111,4 +111,117 @@ func init() {
 		Bytes:  2,
 		Cycles: 5,
 	}
+
+	// --- AND - Bitwise And ---
+	opcodeTable[0x29] = Instruction{
+		Name: "AND",
+		Execute: func(c *CPU) byte {
+			addr := c.IMM()
+			c.AND(c.Bus.Read(uint16(addr)))
+			return 0
+		}, Bytes: 2, Cycles: 2,
+	}
+	opcodeTable[0x25] = Instruction{
+		Name: "AND",
+		Execute: func(c *CPU) byte {
+			addr := c.ZP()
+			c.AND(c.Bus.Read(uint16(addr)))
+			return 0
+		}, Bytes: 2, Cycles: 3,
+	}
+
+	opcodeTable[0x35] = Instruction{
+		Name: "AND",
+		Execute: func(c *CPU) byte {
+			addr := c.ZPX()
+			c.AND(c.Bus.Read(uint16(addr)))
+			return 0
+		}, Bytes: 2, Cycles: 4,
+	}
+
+	opcodeTable[0x2D] = Instruction{
+		Name: "AND",
+		Execute: func(c *CPU) byte {
+			addr := c.ABS()
+			c.AND(c.Bus.Read(uint16(addr)))
+			return 0
+		}, Bytes: 3, Cycles: 4,
+	}
+
+	opcodeTable[0x3D] = Instruction{
+		Name: "AND",
+		Execute: func(c *CPU) byte {
+			addr, pageCrossed := c.ABSX()
+			c.AND(c.Bus.Read(uint16(addr)))
+			if pageCrossed {
+				return 1
+			}
+			return 0
+		}, Bytes: 3, Cycles: 4,
+	}
+
+	opcodeTable[0x39] = Instruction{
+		Name: "AND",
+		Execute: func(c *CPU) byte {
+			addr, pageCrossed := c.ABSY()
+			c.AND(c.Bus.Read(uint16(addr)))
+			if pageCrossed {
+				return 1
+			}
+			return 0
+		}, Bytes: 3, Cycles: 4,
+	}
+
+	opcodeTable[0x21] = Instruction{
+		Name: "AND",
+		Execute: func(c *CPU) byte {
+			addr := c.INDX()
+			c.AND(c.Bus.Read(uint16(addr)))
+			return 0
+		}, Bytes: 2, Cycles: 6,
+	}
+	opcodeTable[0x31] = Instruction{
+		Name: "AND",
+		Execute: func(c *CPU) byte {
+			addr, pageCrossed := c.INDY()
+			c.AND(c.Bus.Read(uint16(addr)))
+			if pageCrossed {
+				return 1
+			}
+			return 0
+		}, Bytes: 2, Cycles: 6,
+	}
 }
+
+func (c *CPU) ADC(value byte) {
+	carry := byte(0)
+	if c.GetFlag(FlagC) {
+		carry = 1
+	}
+	result := uint16(c.A) + uint16(value) + uint16(carry)
+
+	c.SetFlag(FlagC, result > 0xFF)
+	c.SetFlag(FlagV, ((^(c.A ^ value))&(c.A^byte(result))&0x80) != 0)
+
+	c.A = byte(result & 0xFF)
+	c.SetFlag(FlagZ, c.A == 0)
+	c.SetFlag(FlagN, c.A&0x80 != 0)
+}
+
+func (c *CPU) AND(value byte) {
+	c.A = c.A & value
+	c.SetFlag(FlagZ, c.A == 0)
+	c.SetFlag(FlagN, c.A&0x80 != 0)
+}
+
+// func (c *CPU) ASL(addr uint16) {
+// 	value := c.Bus.Read(addr)
+
+// 	c.SetFlag(FlagC, value&0x80 != 0)
+
+// 	value <<= 1
+// 	c.Bus.Write(addr, value)
+
+// 	c.SetFlag(FlagZ, value == 0)
+// 	c.SetFlag(FlagN, value&0x80 != 0)
+// }

@@ -186,11 +186,11 @@ func (c *CPU) INDY() (addr uint16, pageCrossed bool) {
 }
 
 // Relative (branches)
-// func (c *CPU) REL() int8 {
-// 	offset := int8(c.Bus.Read(c.PC))
-// 	c.PC++
-// 	return offset
-// }
+func (c *CPU) REL() int8 {
+	offset := int8(c.Bus.Read(c.PC))
+	c.PC++
+	return offset
+}
 
 //
 // Instructions

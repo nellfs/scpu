@@ -8,6 +8,7 @@ func NewBus() *Bus {
 	return &Bus{}
 }
 
+// Returns a byte from memory
 func (b *Bus) Read(addr uint16) byte {
 	return b.Mem[addr]
 }

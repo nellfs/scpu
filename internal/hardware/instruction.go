@@ -191,6 +191,20 @@ func init() {
 			return 0
 		}, Bytes: 2, Cycles: 6,
 	}
+	opcodeTable[0x90] = Instruction{
+		Name: "BCC",
+		Execute: func(c *CPU) byte {
+			offset := c.REL()
+			branchTaken, pageCrossed := c.BCC(offset)
+			if branchTaken {
+				return 1
+			}
+			if pageCrossed {
+				return 2
+			}
+			return 0
+		}, Bytes: 2, Cycles: 2,
+	}
 }
 
 func (c *CPU) ADC(value byte) {
@@ -225,4 +239,16 @@ func (c *CPU) ASL(addr uint16) {
 
 	c.SetFlag(FlagZ, value == 0)
 	c.SetFlag(FlagN, value&0x80 != 0)
+}
+
+func (c *CPU) BCC(offset int8) (branchTaken bool, pageCrossed bool) {
+	if !c.GetFlag(FlagC) {
+		branchTaken = true
+
+		oldPC := c.PC
+		c.PC = uint16(int32(c.PC) + int32(offset))
+
+		pageCrossed = oldPC&0xFF00 != c.PC&0xFF00
+	}
+	return
 }
